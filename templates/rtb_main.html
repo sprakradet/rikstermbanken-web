@@ -1,0 +1,33 @@
+{% extends "rtb.html" %}
+{% block main %}
+  <h1>Välkommen till Rikstermbanken</h1>
+  <h2><a href="/om.html">Sveriges nationella termbank</a></h2>
+
+  <p>&nbsp;</p>
+  <form namespace="/" id="simpleSearch" name="searchForm" action="/simpleSearch.html" method="post">
+  <fieldset>
+  <legend>Sök i Rikstermbanken</legend>
+  <span style="float:left">
+  <input type="text" name="searchString" size="60" maxlength="70" value="" tabindex="1" id="simpleSearch_searchString"/>
+  </span>
+  <span style="float:right; font-size: 0.8125em">
+  <span id="progress" style="visibility:hidden;">
+  &nbsp;<img src='/static/wait30trans.gif' height="30" width="30"
+  style='border:none; background:none; vertical-align:middle;'/>
+  &nbsp;Sökning pågår ...
+  </span>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="submit" id="submit" name="method:simpleSearch" value="S&#xF6;k" tabindex="2" onclick="showProgress();"/>
+
+  </span>
+  <br/><br/>
+  <input type="radio" name="sokomfattningsval" id="simpleSearch_sokomfattningsvaltermer" checked="checked" value="termer"/><label for="simpleSearch_sokomfattningsvaltermer">enbart bland termer</label>
+  <input type="radio" name="sokomfattningsval" id="simpleSearch_sokomfattningsvalmer" value="mer"/><label for="simpleSearch_sokomfattningsvalmer">även i all annan text</label>
+
+  </fieldset>
+  </form>
+
+  <script type="text/javascript">
+  $("#simpleSearch_searchString").focus();
+  </script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "rtb.html" %}
+{% block title %}<title>Källor | Rikstermbanken</title>{% endblock %}
+{% block main %}
+
+<h6>Källor i Rikstermbanken</h6>
+<table id="kallaList" class="table">
+<thead>
+<tr>
+<th class="">Organisation</th>
+<th class="">Titel</th>
+<th class="">Antal
+  termposter</th></tr></thead>
+<tbody>
+  {% for source in sources %}
+  <tr class="{{loop.cycle('odd', 'even')}}">
+{%- if source._id.publisher|length > 25 %}
+<td title="{{source._id.publisher}}">{{source._id.publisher|truncate(25, True)}}</td>
+{%- else %}
+<td>{{source._id.publisher}}</td>
+{% endif -%}
+{%- if source._id.title and source._id.title|length > 25 %}
+<td title="{{source._id.title}}">
+<a href="/visaKalla.html?id={{source._id.id}}">{{source._id.title|truncate(25, True)}}</a></td>
+{% else %}
+<td>
+<a href="/visaKalla.html?id={{source._id.id}}">{{source._id.title}}</a></td>
+{% endif -%}
+<td>{{source.count}}</td></tr>
+{% endfor %}
+</tbody></table>
+
+
+{% endblock %}

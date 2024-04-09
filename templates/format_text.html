@@ -1,0 +1,23 @@
+{% macro format_annotated_text(annotated_text, plaintext=false) %}
+  {%- for item in annotated_text -%}
+    {%- if "text" in item -%}
+      {{item.text}}
+    {%- elif "tag" in item -%}
+      {%- if plaintext -%}
+        {{format_annotated_text(item.content, plaintext=plaintext)}}
+      {%- else -%}
+        <{{item.tag}}>{{format_annotated_text(item.content)}}</{{item.tag}}>
+      {%- endif -%}
+    {%- elif "term" in item -%}
+      {{item.term.term}} ({{item.term.homonym}})
+    {%- endif -%}
+  {%- endfor -%}
+{% endmacro %}
+
+{% macro format_text(paragraph, plaintext=false) %}
+  {%- if paragraph.text -%}
+    {{paragraph.text}}
+  {%- else -%}
+    {{format_annotated_text(paragraph.annotated_text, plaintext=plaintext)}}
+  {%- endif -%}
+{% endmacro %}

@@ -1,0 +1,165 @@
+{% extends "menysida.html" %}
+{% block breadcrumbtitle %}{{title}}{% endblock %}
+{% block content %}
+{%- set texttypes = {
+"definition":"definition",
+"explanation":"f&#xF6;rklaring"|safe,
+} -%}
+<div class="sv-text-portlet sv-use-margins sv-skip-spacer"
+  id="svid12_179fcf9e16fa899310f1ff8"><div id="Rubrik"><!-- Rubrik -->
+    <!-- --></div><div class="sv-text-portlet-content"><h1
+      class="heading" id="h-Sok">{{title}}<br></h1></div></div>
+
+<form namespace="/" id="simpleSearch" name="searchForm" action="/search" method="post">
+   <div role="search">
+              <label for="search12_179fcf9e16fa899310f2261" class="lp-user-hidden">Sök</label>
+            <input id="search12_179fcf9e16fa899310f2261" class="normal sv-vamiddle c625" type="search" name="searchString" placeholder="Ange sökord" value="{{request.form.searchString}}">
+               <button id="search12_179fcf9e16fa899310f2261button" type="submit" class="normal sv-vamiddle" name="submitButton">
+            <svg role="presentation" aria-hidden="true" class="lp-icon">
+  					<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{ 'images/lp-icons.svg' | staticfile }}#lp-search"></use>
+				</svg>
+            <span class="lp-user-hidden">Sök</span>
+         </button>
+         </div>
+   </form>
+      
+<script type="text/javascript">
+    Form.focusFirstElement(document.forms['searchForm']);
+</script>
+{%- set searchStringWords = searchString.split(" ") %}
+
+    <p class="normal c795" aria-live="polite" aria-atomic="true">
+    {%- trans count=results|length, searchString=request.form.searchString %}
+        Din sökning <strong>{{searchString}}</strong> gav
+    <strong>{{count}}</strong> träff
+    {% pluralize %}
+        Din sökning <strong>{{searchString}}</strong> gav
+    <strong>{{count}}</strong> träffar
+    {% endtrans -%}
+	 </p>
+	 <div class="search12_179fcf9e16fa899310f2261hits lp-search-hits">
+	   <div id="search12_179fcf9e16fa899310f2261_facetsContainer" class="sv-search-facets lp-search-facets" role="navigation" aria-controls="search12_179fcf9e16fa899310f2261_facetSearch" aria-label="Sökfacetter">
+
+	    {% if type_matches %}
+      <div class="sv-search-facet lp-search-facet lp-search-facet--facet">
+      <div class="lp-expandable-content__wrap
+	lp-expandable-content__wrap--search-facets">
+	<button class="lp-expandable-content__toggler"
+      aria-controls="lp-toggle-target-0" aria-expanded="true"><svg
+      class="lp-icon lp-toggler-icon lp-toggler-icon--close"
+      aria-hidden="true"><use
+      xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{
+      'images/lp-icons.svg' | staticfile }}#lp-minus"></use></svg><svg
+      class="lp-icon lp-toggler-icon lp-toggler-icon--open"
+      aria-hidden="true"><use
+      xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{
+      'images/lp-icons.svg' | staticfile }}#lp-plus"></use></svg><p
+      class="normal sv-search-facet-name
+	lp-search-facet__name">Sök i</p></button>
+	<ul class="sv-defaultlist-noleft sv-notopmargin sv-search-facet-items lp-search-facet__items lp-expandable-content__content" id="lp-toggle-target-0" aria-hidden="true" style="">
+	  {% for type, hits in type_matches.items() %}
+	  <li class="normal sv-noleft sv-search-facet-item lp-search-facet__item">
+	  <a href="">{{type}} ({{hits}})</a>
+	  </li>
+	  {% endfor %}
+	</ul></div>
+	</div>
+{% endif %}
+
+	    {% if lang_matches %}
+      <div class="sv-search-facet lp-search-facet lp-search-facet--facet">
+      <div class="lp-expandable-content__wrap
+	lp-expandable-content__wrap--search-facets">
+	<button class="lp-expandable-content__toggler"
+      aria-controls="lp-toggle-target-0" aria-expanded="true"><svg
+      class="lp-icon lp-toggler-icon lp-toggler-icon--close"
+      aria-hidden="true"><use
+      xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{
+      'images/lp-icons.svg' | staticfile }}#lp-minus"></use></svg><svg
+      class="lp-icon lp-toggler-icon lp-toggler-icon--open"
+      aria-hidden="true"><use
+      xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{{
+      'images/lp-icons.svg' | staticfile }}#lp-plus"></use></svg><p
+      class="normal sv-search-facet-name
+	lp-search-facet__name">Språk</p></button>
+	<ul class="sv-defaultlist-noleft sv-notopmargin sv-search-facet-items lp-search-facet__items lp-expandable-content__content" id="lp-toggle-target-0" aria-hidden="true" style="">
+	  {% for lang, hits in lang_matches.items() %}
+	  <li class="normal sv-noleft sv-search-facet-item lp-search-facet__item">
+	  <a href="">{{lang}} ({{hits}})</a>
+	  </li>
+	  {% endfor %}
+	</ul></div>
+	</div>
+{% endif %}
+
+	
+   </div>
+<div role="main" id="search12_179fcf9e16fa899310f2261_facetSearch"
+  class="lp-search-result">
+{%- for result in results %}
+  {%- set matchlang = result.matches|map(attribute="lang") | list %}
+  {% set otherlang = result.terms|selectattr("status", "in", ["TE","SYTE"])|map(attribute='lang')|reject("in", matchlang) | list | unique | sort -%}
+  <dl>
+    <dt>
+      {% for langgroup in result.matches %}
+        {%- set langgroup_loop = loop %}
+        {%- for term in langgroup.matches|map(attribute="match") -%}
+          <span class="{% if term.status == "AVTE" %}termFontDeprecated{% endif %}">{%- if not loop.first %}
+            {% endif -%}
+            {%- if term.status == "TE" and langgroup_loop.first %}
+              <a href="visaTermpost.html?id={{result.id}}">
+            {% endif -%}
+            {% for word in term.term.split(" ") %}
+              {%- if word in searchStringWords -%}
+                <span class="matchingString">{{word}}</span>
+              {%- else -%}
+                {{word}}
+              {%- endif -%}
+              {%- if not loop.last %} {% endif -%}
+            {%- endfor %}
+            {%- if term.homonym %} ({{term.homonym}}){% endif -%}
+            {% if term.status == "TE"  and langgroup_loop.first %}</a>{% endif -%}
+          </span>
+          {%- if not loop.last %}, {% endif -%}
+        {%- endfor %}
+        {% if not langgroup_loop.first %}&nbsp;{% endif %}<span class="languageId">{% if langgroup_loop.first %}&nbsp;{% endif %}{{langgroup.lang}}</span>
+        {%- if not langgroup_loop.last %}
+      &nbsp;{% endif %}
+      {%- endfor %}
+    </dt>
+    <dd>
+      {%- if result.priotext %}
+        <span class="styckenMedIndrag">{# -#}
+          <p>{# -#}
+            <span class="trafflistrubrik">{{texttypes[result.priotext.0.type]}}:</span>
+            {{result.priotext.0.text|truncate(78, end=" ...")}}
+            {%- if result.priotext.0.lang != "sv" %}
+              &nbsp;<span class="languageId">{{result.priotext.0.lang}}</span>
+            {%- endif %}
+          </p>{# -#}
+        </span>
+      {%- endif %}
+      {%- if otherlang %}
+        <span class="styckenMedIndrag">{# -#}
+          <p>{# -#}
+            <span class="trafflistrubrik">övriga språk:</span>
+            <span class="languageId">{{otherlang|join(", ")}}</span>{# -#}
+          </p>{# -#}
+        </span>
+      {%- endif %}
+      {% if result.kalla -%}
+        <span class="styckenMedIndrag"><p><span class="trafflistrubrik">källa:</span>
+          {{result.kalla.publisher|escapeall}}: {{result.kalla.title|escapeall}} 
+          {%- if result.kalla.year %} | {{result.kalla.year}}{% endif %}
+          {%- if result.kalla.place %}, {{result.kalla.place|escapeall}}{% endif -%}
+        </p></span>
+      {%- endif %}
+      <p class="visa">
+        <a class="underlined" href="visaTermpost.html?id={{result.id}}">Visa hela termposten</a>{# -#}
+      </p>
+    </dd>
+  </dl>
+  {%- endfor -%}
+  </div>
+  </div>
+{% endblock %}

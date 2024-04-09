@@ -1,0 +1,128 @@
+{% extends "rtb.html" %}
+{% from "format_text.html" import format_text %}
+{% block title %}<title>Sökresultat | Rikstermbanken</title>{% endblock %}
+{% block main %}
+{%- set texttypes = {
+"definition":"definition",
+"explanation":"f&#xF6;rklaring"|safe,
+} -%}
+    <span class="lankstig">
+        Enkel sökning
+</span>
+<div class="hr" id="breadcrumb">
+  <hr/>
+</div>
+<form namespace="/" id="simpleSearch" name="searchForm" action="/simpleSearch.html" method="post">
+ <fieldset>
+ <legend>Sök i Rikstermbanken</legend>
+ <span style="float:left">
+ <input type="text" name="searchString" size="60" maxlength="70" value="{{request.form.searchString}}" tabindex="1" id="simpleSearch_searchString"/>
+ </span>
+ <span style="float:right; font-size: 0.8125em">
+ <span id="progress" style="visibility:hidden;">
+ &nbsp;<img src='/static/wait30trans.gif' height="30" width="30"
+ style='border:none; background:none; vertical-align:middle;'/>
+ &nbsp;Sökning pågår ...
+ </span>
+ &nbsp;&nbsp;&nbsp;&nbsp;
+ <input type="submit" id="submit" name="method:simpleSearch" value="S&#xF6;k" tabindex="2" onclick="showProgress();"/>
+ </span>
+ <br/><br/>
+ <input type="radio" name="sokomfattningsval" id="simpleSearch_sokomfattningsvaltermer" checked="checked" value="termer"/><label for="simpleSearch_sokomfattningsvaltermer">enbart bland termer</label>
+<input type="radio" name="sokomfattningsval" id="simpleSearch_sokomfattningsvalmer" value="mer"/><label for="simpleSearch_sokomfattningsvalmer">även i all annan text</label>
+ </fieldset>
+</form>
+<div class="hr">
+  <hr/>
+</div>
+    <p style="text-align:right; font-size:0.8125em;">
+    {%- if toomany %}
+        Du fick fler än 1000 träffar, och resultaten kan därför
+inte visas. Försök göra en snävare sökning.
+    {% elif more %}
+        Resultat:
+            fler än {{results|length}} träffar vid sökning efter
+        "{{request.form.searchString}}".
+    {% else %}
+    {%- trans count=results|length, searchString=request.form.searchString %}
+        Resultat:
+            {{count}} träff vid sökning efter
+        "{{searchString}}".
+    {% pluralize %}
+        Resultat:
+            {{count}} träffar vid sökning efter
+        "{{searchString}}".
+    {% endtrans -%}
+    {%- endif -%}
+    </p>
+{%- for result in results %}
+  {%- set matchlang = result.matches|map(attribute="lang") | list %}
+  {% set otherlang = result.terms|selectattr("status", "in", ["TE","SYTE"])|map(attribute='lang')|reject("in", matchlang) | list | unique | sort -%}
+  <dl>
+    <dt>
+      {% for langgroup in result.matches %}
+        {%- set langgroup_loop = loop %}
+        {%- for match in langgroup.matches -%}
+          {%- set term = match.match -%}
+          <span class="{% if term.status == "AVTE" %}termFontDeprecated{% endif %}">{%- if not loop.first %}
+            {% endif -%}
+            {%- if term.status == "TE" and langgroup_loop.first %}
+              <a href="/termposter/{{result.kalla.id}}/{{result.slugs.0}}">
+            {% endif -%}
+            {% for word in match.text.split(" ") %}
+              {%- if word|matchesany(searchStringExpressions) -%}
+                <span class="matchingString">{{word}}</span>
+              {%- else -%}
+                {{word}}
+              {%- endif -%}
+              {%- if not loop.last %} {% endif -%}
+            {%- endfor %}
+            {%- if term.homonym %} ({{term.homonym}}){% endif -%}
+            {% if term.status == "TE"  and langgroup_loop.first %}</a>{% endif -%}
+          </span>
+          {%- if not loop.last %}, {% endif -%}
+        {%- endfor %}
+        {% if not langgroup_loop.first %}&nbsp;{% endif %}<span class="languageId">{% if langgroup_loop.first %}&nbsp;{% endif %}{{langgroup.lang}}</span>
+        {%- if not langgroup_loop.last %}
+      &nbsp;{% endif %}
+      {%- endfor %}
+    </dt>
+    <dd>
+      {%- if result.priotext %}
+        <span class="styckenMedIndrag">{# -#}
+          <p>{# -#}
+            <span class="trafflistrubrik">{{texttypes[result.priotext.0.type]}}:</span>
+            {{format_text(result.priotext.0.paragraphs.0, plaintext=true)|truncate(78, end=" ...")}}
+            {%- if result.priotext.0.lang != "sv" %}
+              &nbsp;<span class="languageId">{{result.priotext.0.lang}}</span>
+            {%- endif %}
+          </p>{# -#}
+        </span>
+      {%- endif %}
+      {%- if otherlang %}
+        <span class="styckenMedIndrag">{# -#}
+          <p>{# -#}
+            <span class="trafflistrubrik">övriga språk:</span>
+            <span class="languageId">{{otherlang|join(", ")}}</span>{# -#}
+          </p>{# -#}
+        </span>
+      {%- endif %}
+      {% if result.kalla -%}
+        <span class="styckenMedIndrag"><p><span class="trafflistrubrik">källa:</span>
+          {{result.kalla.publisher|escapeall}}: {{result.kalla.title|escapeall}} 
+          {%- if result.kalla.year %} | {{result.kalla.year}}{% endif %}
+          {%- if result.kalla.place %}, {{result.kalla.place|escapeall}}{% endif -%}
+        </p></span>
+      {%- endif %}
+      <p class="visa">
+        <a class="underlined" href="/termposter/{{result.kalla.id}}/{{result.slugs.0}}">Visa hela termposten</a>{# -#}
+      </p>{# {{result.sortkey}} #}
+    </dd>
+  </dl>
+{%- endfor -%}
+{%- if more %}
+  <p style='text-align: center;'>
+  <i>Här visas bara de första {{results|length}} träffarna.</i>
+  </p>
+{% endif -%}
+{% endblock %}

@@ -1,0 +1,240 @@
+{% from "format_text.html" import format_text %}
+
+{% macro format_annotated(annotated_term) -%}
+  {% for e in annotated_term %}
+    {%- if "text" in e -%}
+      {{e.text}}
+    {%- elif "tag" in e -%}
+      <{{e.tag}}>{{format_annotated(e.content)}}</{{e.tag}}>
+    {%- endif -%}
+  {% endfor %}
+{%- endmacro %}
+
+
+{% macro format_termname(term) -%}
+  {%- if "term" in term -%}
+    {{term.term}}
+    {%- if term.homonym %} ({{term.homonym}}){% endif -%}
+  {%- else -%}
+    {%- for e in term.annotated_term -%}
+      {{format_annotated([e])}}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endmacro %}
+
+<table style="margin-bottom: 7px; border:1px solid gray;" width="100%" cellpadding="3" cellspacing="0">
+<colgroup>
+    <col valign="top" width="25%"/>
+    <col valign="top"/>
+</colgroup>
+
+{% for language in languages %}
+{% set language_loop = loop %}
+{% for termgroup in language.termgroups %}
+{% set termgroup_loop = loop %}
+{% for term in termgroup.group %}
+<tr class="{{language_loop.cycle('languageBandOdd', 'languageBandEven')}}">
+<td class="fieldlabel" valign="top" style="padding-right: 7px;">
+        
+        {% if loop.first %}
+	  {% if termgroup.key.termtype == "formula" %}
+            {% if termgroup.group|length > 1 %}
+              {{iftexts.formula.pl[termgroup.key.level]}}:
+	    {% else %}
+              {{iftexts.formula.sg[termgroup.key.level]}}:
+	    {% endif %}
+	  {% elif termgroup.key.termtype == "phrase" %}
+            {% if termgroup.group|length > 1 %}
+              {{iftexts.lang.pl[language.lang]}}&nbsp;{{iftexts.phrase.pl[termgroup.key.level]}}:
+	    {% else %}
+              {{iftexts.lang.sg[language.lang]}}&nbsp;{{iftexts.phrase.sg[termgroup.key.level]}}:
+	    {% endif %}
+	  {% else %}
+            {% if termgroup.group|length > 1 %}
+              {{iftexts.lang.pl[language.lang]}}&nbsp;{{iftexts.term.pl[termgroup.key.level]}}:
+	    {% else %}
+              {{iftexts.lang.sg[language.lang]}}&nbsp;{{iftexts.term.sg[termgroup.key.level]}}:
+	    {% endif %}
+	  {% endif %}
+        {% endif %}
+        
+
+        
+        
+    
+</td>
+<td>
+    
+    {% if language_loop.first and termgroup_loop.first and loop.first %}
+                <span class="termFontFirst">
+		{% endif %}
+            
+            <span class="
+{%- if termgroup.key.termtype == "formula" %}termFont termFontFormula {% endif -%}
+{%- if termgroup.key.level == 'dep' %}termFontDeprecated{% endif -%}
+  ">
+  {%- if term.lang == "ar" %}
+  <span dir="rtl" lang="{{term.lang}}">{{format_termname(term)}}</span>
+  {%- else %}
+  {{format_termname(term)}}
+  {%- endif %}
+            {% if term.narrowing %}({{term.narrowing}}){% endif %}
+            
+            </span>
+    {% if language_loop.first and termgroup_loop.first and loop.first %}
+                </span>
+		{% endif %}
+    
+    {% if term.abbreviation %}
+       <span class="genus">({{iftexts.textmisc.abbreviation}})&nbsp;</span>
+    {% elif term["full form"] %}
+       <span class="genus">({{iftexts.textmisc.fullform}})&nbsp;</span>
+    {% endif %}
+            <span class="">
+
+
+            {% if term.gender %}
+               <span class="genus">({{term.gender.split(" eller ")|join("/")}})&nbsp;</span>
+            {% endif %}
+            {% if term.grammar or term.pos_not_obvious %}
+               <span class="partOfSpeech">
+	       {%- if term.grammar %}({{term.grammar}})&nbsp;{% endif -%}
+	       {%- if term.pos_not_obvious %}{{term.get("pos", "okänd")}}&nbsp;{% endif -%}
+	       </span>
+            {% endif %}
+            {% if term.pronunciation %}
+               <span class="pronunciation">[{{term.pronunciation}}]&nbsp;</span>
+            {% endif %}
+            {% if term.geo %}
+               <span class="geografiskt">/{{term.geo}}/&nbsp;</span>
+            {% endif %}
+            {% if term.inflection %}
+	    {%- for inflection in term.inflection -%}
+               {%- if not loop.first %}
+                 <span class="partOfSpeech">el.</span>
+               {% endif -%}
+               <span class="inflection">{{inflection.get("definite_or_neuter", "")|default("", true)}}
+	       {{inflection.get("plural", "")|default("", true)}}</span>
+	    {% endfor -%}
+            {% endif %}
+	    {% if term.source %}
+	       <span class="languageId">(Källa: {{term.source}})&nbsp;</span>
+	    {% endif %}
+            
+            </span>
+</td>
+</tr>
+{% endfor %}
+{% endfor %}
+
+
+
+    {% for textrow in language.texts %}
+    <tr class="{{language_loop.cycle('languageBandOdd', 'languageBandEven')}}">
+        <td valign="top" class="fieldlabel">
+            
+                {{iftexts.texttype[textrow.type]}}:
+            
+        </td>
+        <td>
+	  {% if textrow.type == "domain" %}
+	  {%- for paragraph in textrow.paragraphs -%}
+	    {{format_text(textrow.paragraphs.0)}}
+	    {%- endfor -%}
+	    {% else %}
+            <span class="styckenMedIndrag">
+	    {%- for paragraph in textrow.paragraphs -%}
+	    <p>{{format_text(paragraph)}}
+	    {%- if textrow.source and loop.last %}
+	      <span class="languageId">(Källa: {{textrow.source}})&nbsp;</span>
+	    {% endif %}
+	    </p>
+	    {% endfor %}</span>
+	    {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+
+
+
+
+
+{% if language_loop.first and seealso %}
+    <tr class="{{language_loop.cycle('languageBandOdd', 'languageBandEven')}}">
+        <td valign="top">
+            
+            
+            <span class="fieldlabel">{{iftexts.texttype.seealso}}:</span>
+        </td>
+        <td valign="top">
+                    <span class="styckenMedIndrag"><p>
+                        {% for term in seealso %}
+			<a href="/termposter/{{term.kalla.id}}/{{term.slugs.0}}">{{format_termname(term.terms.0)}}</a>{% if not loop.last %},{% endif %}
+			{% endfor %}
+                        
+                        
+                    </p></span>
+        </td>
+    </tr>
+{% endif %}
+
+{% if language_loop.first and seeunder %}
+    <tr class="{{language_loop.cycle('languageBandOdd', 'languageBandEven')}}">
+        <td valign="top">
+            
+            
+            <span class="fieldlabel">{{iftexts.texttype.seeunder}}:</span>
+        </td>
+        <td valign="top">
+                    <span class="styckenMedIndrag"><p>
+                        {% for term in seeunder %}
+			<a href="/termposter/{{term.kalla.id}}/{{term.slugs.0}}">{{format_termname(term.terms.0)}}</a>{% if not loop.last %},{% endif %}
+			{% endfor %}
+                        
+                        
+                    </p></span>
+        </td>
+    </tr>
+{% endif %}
+
+{% endfor %}
+
+
+    <tr class="languageBandOdd">
+        <td colspan=2 valign="top" style="border-top: thin solid gray; line-height:1px;">&nbsp;</td>
+    </tr>
+
+
+    {% if classifications %}
+    <tr class="languageBandOdd">
+      <td valign="top">
+	<span class="fieldlabel">{{iftexts.texttype.classification}}:</span>
+      </td>
+      <td valign="top">
+    {% for classification in classifications %}
+	{{classification.value}}
+	[<a href="{{classification.system.url}}" title="{{classification.system.description|default}}" target="_blank">{{classification.system.short_name}}</a>]
+    {% endfor %}
+      </td>
+    </tr>
+    {% endif %}
+
+
+    <tr class="languageBandOdd">
+        <td valign="top">
+            <span class="fieldlabel">{{iftexts.texttype.source}}:</span>
+        </td>
+        <td>
+            <a href="/visaKalla.html?id={{kalla.id}}">{{kalla.get("publisher", "")}}: {{kalla.title|default("",true)}}{% if kalla.year %} | {{kalla.year}}{% endif %}{% if kalla.comment %} [{{kalla.comment}}]{% endif %}{% if kalla.place %}, {{kalla.place}}{% endif %}</a>
+        </td>
+    </tr>
+    
+
+
+<tr class="languageBandOdd">
+    <td colspan="2" align="right">
+        <a class="underlined" href="/startSkickaSynpunkter.html">
+            Synpunkter på denna termpost?</a>
+    </td>
+</tr>
+</table>

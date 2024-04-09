@@ -1,0 +1,331 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Cache-Control" content="no-store"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+</head>
+<body>
+
+<script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="/static/underscore-1.9.1-min.js"></script>
+<script type='text/javascript' src='/static/scripts/json-pretty-print.js'></script>
+<link type='text/css' href='/static/json-pretty-print.css' rel='stylesheet'/>
+ <style>
+ pre {
+     white-space: pre-wrap;
+     font-family: Verdana;
+ }
+ .diff_removed {
+     background-color: #e3e3ff;
+     font-family: Verdana;
+     margin-bottom: 0.5em;
+     padding: 0.5em;
+ }
+ .diff_added {
+     background-color: #ffffc0;
+     font-family: Verdana;
+     margin-bottom: 0.5em;
+     padding: 0.5em;
+}
+ .diff_word {
+     padding: 0 0.3em;
+     margin-right: 0.5em;
+ }
+ h1 {
+     margin-top: 2em;
+}
+body {
+margin-bottom: 80pt;
+}
+ html {
+margin: 1em;
+     font-family: Georgia;
+ }
+ .changed_diff {
+     margin-left: 1em;
+margin-bottom: 1em;
+}
+ .changed_diff_header {
+ flex-shrink: 0;
+     background-color: #e8e8e8;
+     font-family: Verdana;
+     margin-bottom: 0.5em;
+     padding: 0.5em;
+ }
+ .changed_diff_wrapper {
+display: flex;
+margin-left: 1em;
+     margin-bottom: 1em;
+ }
+ .changed_diff .diff_removed,
+ .changed_diff .diff_added {
+     display: flex;
+}
+
+.changed_diff_wrapper .hideshow-showbutton, .changed_diff_wrapper .hideshow-hidebutton {
+padding: 0.5em;
+}
+
+.hideshow-showbutton, .hideshow-hidebutton {
+cursor: pointer;
+padding-left: 1em;
+color: blue;
+text-decoration: underline;
+font-family: Verdana;
+}
+
+
+.fieldlabel {
+    font-variant: small-caps;
+}
+
+.termpost_render {
+width: 615px;
+font-family: Arial, Verdana, Geneva, Helvetica, sans-serif;
+line-height: 1em;
+font-size: 13px;
+}
+
+span.termFontFirst {
+font-weight: bold;
+}
+
+
+p {
+/*font-size: 0.8125em;*/
+    margin: 0 0 10px 0;
+    padding: 0;
+    line-height: 1.25em;
+}
+
+.styckenMedIndrag p {
+    margin: 0 0 0 0;
+    text-indent: 1.25em;
+}
+
+.styckenMedIndrag p:first-child {
+    text-indent: 0;
+}
+
+.languageBandEven {
+    background-color: #e6e6e6;
+}
+
+.languageBandOdd {
+    background-color: #ffffff;
+}
+
+.languageId {
+    color: gray;
+}
+
+span.termFont, span.termFontFirst {
+/*font-size: 0.8125em;*/
+}
+
+span.termFontFirst {
+    font-weight: bold;
+}
+
+span.termFontDeprecated {
+    text-decoration: line-through;
+}
+
+span.termFontFormula {
+    font-size: larger;
+}
+
+span.inflection {
+    font-style: italic;
+}
+
+span.partOfSpeech {
+    font-size: 0.75em;
+}
+
+.hideshow-termpost {
+margin-bottom: 1em;
+}
+
+.errormessage {
+     background-color: #ffc0c0;
+     font-family: Verdana;
+     margin-bottom: 0.5em;
+     padding: 0.5em;
+}
+h2 {
+margin-top: 2em;
+}
+
+.publishform {
+display: inline-block;
+}
+</style>
+
+
+<script>
+$(function () {
+$(".hideable").hide().wrap("<div class='hideshow'></div>")
+$(".hideshow").prepend("<div class='hideshow-showbutton'>Visa ändringar \u25bc</div><div class='hideshow-hidebutton'>Göm ändringar \u25b2</div>");
+$(".termpost_render").hide().wrap("<div class='hideshow-termpost'></div>")
+$(".hideshow-termpost").prepend("<div class='hideshow-showbutton'>Visa termpost \u25bc</div><div class='hideshow-hidebutton'>Göm termpost \u25b2</div>");
+$(".hideshow-hidebutton").hide().click(function() {
+let hideshow = $(this).parent(".hideshow,.hideshow-termpost");
+hideshow.find(".hideshow-showbutton").show();
+hideshow.find(".hideshow-hidebutton").hide();
+hideshow.find(".hideable,.termpost_render").hide();
+});
+$(".hideshow-showbutton").show().click(function() {
+console.log("show", this);
+let hideshow = $(this).parent(".hideshow,.hideshow-termpost");
+hideshow.find(".hideshow-showbutton").hide();
+hideshow.find(".hideshow-hidebutton").show();
+hideshow.find(".hideable,.termpost_render").show();
+});
+});
+</script>
+
+
+<h1>Admin</h1>
+
+{% for source_id, source_filename, source_diff, errors in diffs %}
+<h1>Källa {{source_id}} {{source_filename}}
+<form class="publishform" method="post" action="publish">
+<button>Publicera</button>
+<input type="hidden" name="kallid" value="{{source_id}}">
+<input type="hidden" name="gitversion" value="{{gitversion}}">
+</form>
+</h1>
+{% if errors %}
+<h2>Felmeddelanden</h2>
+{% for error in errors %}
+<p class="errormessage">{{error}}</p>
+{% endfor %}
+{% endif %}
+{% if source_diff.removed_metadata %}
+<h2>Borttagen metadata</h2>
+<ul>
+  {% for diff in source_diff.removed_metadata %}
+  <li>{{diff.key}}:
+              <div class='changed_diff'>
+            <div class='diff_removed'>
+            <div class='diff-sign'>−</div><div class='json-pretty-print'>{{diff.value|jsonify}}</div>
+            </div>
+            </div>
+{% endfor %}
+</ul>
+{% endif %}
+{% if source_diff.added_metadata %}
+<h2>Tillagd metadata</h2>
+<ul>
+  {% for diff in source_diff.added_metadata %}
+  <li>{{diff.key}}:
+              <div class='changed_diff'>
+            <div class='diff_added'>
+            <div class='diff-sign'>+</div><div class='json-pretty-print'>{{diff.value|jsonify}}</div>
+            </div>
+            </div>
+{% endfor %}
+</ul>
+{% endif %}
+{% if source_diff.changed_metadata %}
+<h2>Ändrad metadata</h2>
+<ul>
+  {% for diff in source_diff.changed_metadata %}
+  <li>{{diff.key}}:
+              <div class='changed_diff'>
+            <div class='diff_removed'>
+            <div class='diff-sign'>−</div><div class='json-pretty-print'>{{diff.removed|jsonify}}</div>
+            </div>
+            <div class='diff_added'>
+            <div class='diff-sign'>+</div><div class='json-pretty-print'>{{diff.added|jsonify}}</div>
+            </div>
+            </div>
+{% endfor %}
+</ul>
+{% endif %}
+{% if source_diff.removed_terms %}
+<h2>Borttagna termer</h2>
+{% for term in source_diff.removed_terms %}
+<h3> {{term}} </h3>
+{% endfor %}
+{% endif %}
+{% if source_diff.added_terms %}
+<h2>Tillagda termer</h2>
+{% for term in source_diff.added_terms %}
+<h3> {{term}} </h3>
+<div class="termpost_render">{{source_id|termpost_render(term)}}</div>
+{% endfor %}
+{% endif %}
+{% if source_diff.changed_terms %}
+<h2>Ändrade termer</h2>
+{% for diffs in source_diff.changed_terms %}
+{% for diff in diffs %}
+{% if diff.action == "diff" %}
+<h3> {{diff.title}} </h3>
+<div class="termpost_render">{{source_id|termpost_render(diff.title)}}</div>
+{% if diff.removed %}
+<div class='changed_diff'>
+  {% for removed in diff.removed %}
+<div class='diff_removed'>
+  <div class='diff-sign'>− {{removed.key}}</div><div
+    class='json-pretty-print hideable'>{{removed.value|jsonify}}</div>
+  </div>
+  {% endfor %}
+  </div>
+{% endif %}
+{% if diff.added %}
+<div class='changed_diff'>
+  {% for added in diff.added %}
+<div class='diff_added'>
+  <div class='diff-sign'>+ {{added.key}}</div><div
+    class='json-pretty-print hideable'>{{added.value|jsonify}}</div>
+  </div>
+  {% endfor %}
+  </div>
+  {% endif %}
+  {% for changed in diff.changed %}
+  <div class='changed_diff_wrapper'>
+  <div class='changed_diff_header'>* {{changed.key}}</div>
+  <div class='changed_diff hideable'>
+  <div class='diff_removed'>
+  <div class='diff-sign'>−</div>
+  <div class='json-pretty-print'>{{changed.removed|jsonify}}</div>
+      </div>
+      <div class='diff_added'>
+      <div class='diff-sign'>+</div>
+      <div class='json-pretty-print'>{{changed.added|jsonify}}</div>
+      </div>
+      </div>
+      </div>
+	
+  {% endfor %}
+{% elif diff.action == "removed" %}
+<h3> {{diff.title}} borttagen</h3>
+<pre>{{diff.removed}}</pre>
+{% elif diff.action == "added" %}
+<h3> {{diff.title}} tillagd</h3>
+<pre>{{diff.added}}</pre>
+{% else %}
+<pre>
+{{diff}}
+</pre>
+{% endif %}
+{% endfor %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{% for source_id, source_filename, errors in other_errors %}
+<h1>Källa {{source_id}} {{source_filename}}</h1>
+<h2>Felmeddelanden</h2>
+{% for error in errors %}
+<p class="errormessage">{{error}}</p>
+{% endfor %}
+{% endfor %}
+
+<body>
+</html>

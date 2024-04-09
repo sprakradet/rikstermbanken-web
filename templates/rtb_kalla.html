@@ -1,0 +1,219 @@
+{% extends "rtb.html" %}
+{% block title %}<title>Detaljer för källa | Rikstermbanken</title>{% endblock %}
+{% block main %}
+<h1>Detaljer för en källa</h1>
+                <span class="lankstig">
+
+    
+    
+    
+        <a class="underlined" href="/kallor.html">
+            Källor
+        </a>
+    
+    
+
+    
+    &gt;
+    
+    
+        
+        Källa
+    
+
+</span>
+
+<div class="hr" id="breadcrumb">
+    <hr/>
+</div>
+
+
+<table style="margin-bottom:10px;border-spacing:0pt;border:2px solid #DDE2EA" width="625px" cellpadding="2">
+<colgroup>
+    <col width="30%">
+    <col>
+</colgroup>
+
+
+
+<!-- Visa nÃ¤stlade klasser (i detta fall sÃ¥ Ã¤r det titel) -->
+
+    <tr class="dkgrey">
+        <td valign="top" class="fieldlabel">
+            titel
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Titel}}
+        </td>
+    </tr>
+
+{% if kalla.Titel_kortform != kalla.Titel %}
+    <tr>
+        <td valign="top" class="fieldlabel">
+            kortform av titel
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Titel_kortform}}
+        </td>
+    </tr>
+{% endif %}
+
+{% if kalla. Titel_överordnad %}
+    <tr class="dkgrey">
+        <td valign="top" class="fieldlabel">
+             överordnad titel
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Titel_överordnad}}
+        </td>
+    </tr>
+{% endif %}
+
+{% if kalla.Titel_dokumentnr %}
+    <tr>
+        <td valign="top" class="fieldlabel">
+            dokumentnummer
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Titel_dokumentnr}}
+        </td>
+    </tr>
+{% endif %}
+
+    <tr class="dkgrey">
+        <td valign="top" class="fieldlabel">
+            utgivningsår
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Utgivningsår}}
+        </td>
+    </tr>
+
+{% if kalla.Utgåvenr %}
+    <tr>
+        <td valign="top" class="fieldlabel">
+            utgåvenr
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Utgåvenr}}
+        </td>
+    </tr>
+{% endif %}
+
+    <tr class="dkgrey">
+        <td valign="top" class="fieldlabel">
+            länk
+        </td>
+        <td class="termpostsidavarde">
+            <a class="underlined" href="{{kalla.URL}}" target="_blank">{{kalla.URL}}</a>
+        </td>
+    </tr>
+
+{% if kalla.Bakgrund %}
+    <tr>
+        <td valign="top" class="fieldlabel">
+            bakgrund
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Bakgrund}}
+        </td>
+    </tr>
+{% endif %}
+
+
+{% if kalla.Ställe %}
+    <tr class="dkgrey">
+        <td valign="top" class="fieldlabel">
+            ställe
+        </td>
+        <td class="termpostsidavarde">
+            {{kalla.Ställe}}
+        </td>
+    </tr>
+{% endif %}
+
+
+{% if kalla.Sekretariatskommentar %}
+    <tr class="dkgrey">
+        <td valign="top" class="fieldlabel">
+            sekretariatskommentar
+        </td>
+        <td class="termpostsidavarde">
+          {{kalla.Sekretariatskommentar | escape | replace("{b}", "<b>" | safe) | replace("{/b}", "</b>" | safe)}}
+	</td>
+    </tr>
+{% endif %}
+
+
+<tr>
+    <td valign="top" class="fieldlabel">
+        antal termposter
+    </td>
+    <td class="termpostsidavarde">
+        {{ntermposts}}
+    </td>
+</tr>
+
+
+
+
+<tr>
+    <td valign="top" class="fieldlabel">
+        &nbsp;
+    </td>
+</tr>
+
+<!-- Alla utgivare -->
+
+{% for utgivare in kalla.Utgivare %}
+        <tr>
+            <td valign="top" class="fieldlabel">
+                
+                    <b>utgivare</b>
+                
+                
+            </td>
+        </tr>
+        
+            
+                <tr>
+                    <td valign="top" class="fieldlabel">
+                        organisation
+                    </td>
+                    <td class="termpostsidavarde">
+                        {{utgivare.organisation}}
+                    </td>
+                </tr>
+
+{% if utgivare.författare %}
+                <tr>
+                    <td valign="top" class="fieldlabel">
+                        författare
+                    </td>
+                    <td class="termpostsidavarde">
+                        {{utgivare.författare}}
+                    </td>
+                </tr>
+{% endif %}
+		
+{% endfor %}
+            
+        
+    
+
+    
+
+</table>
+
+<table width="100%" style="margin-bottom: 0;">
+    <tr>
+        <td>
+            
+        </td>
+        <td>
+            
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

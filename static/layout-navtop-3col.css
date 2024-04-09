@@ -1,0 +1,60 @@
+/* A CSS Framework by Mike Stenhouse of Content with Style */
+/* NAV BAR AT THE TOP, LOCAL NAV ON THE LEFT AND TWO COLUMNS OF CONTENT */
+
+@import url( nav-horizontal.css );
+
+div#main {
+    float: left;
+    /* MMU
+    width: 445px;
+    */
+    width: 615px; /* Utöka bredden på innehållsfältet så man får plats med mer */
+    margin-left: 211px;
+    display: inline;
+}
+
+/* HAnterar undermenyn */
+div#sub {
+    display: none; /* Ta bort denna fula meny */
+    float: right;
+    width: 120px;
+    margin: 0 0 20px 0;
+    padding: 0 20px 0 0;
+    font-size: 0.90em;
+    line-height: 1.5em;
+}
+
+div#sub h2 {
+    font-size: 0.9em;
+    line-height: 1.5em;
+}
+
+div#sub p {
+    margin: 0 0 1.6em 0;
+    line-height: 1.5em;
+}
+
+div#local {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    float: right;
+    width: 150px;
+    display: inline;
+}
+
+div#local li {
+    list-style: none;
+    margin-left: 10px;
+}
+
+div#nav {
+    position: absolute;
+    top: 0;
+    left: 27px; /* Styr identeringen av vänstermenyn */
+    float: left;
+    width: 163px; /* Styr bredden på av vänstermenyn(?) */
+    display: inline;
+}
+
+/* END CONTENT */

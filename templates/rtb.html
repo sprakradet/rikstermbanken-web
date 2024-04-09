@@ -1,0 +1,135 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<!-- HTTP 1.1 -->
+<meta http-equiv="Cache-Control" content="no-store"/>
+<!-- HTTP 1.0 -->
+<meta http-equiv="Pragma" content="no-cache"/>
+<!-- Prevents caching at the Proxy Server -->
+<meta http-equiv="Expires" content="0"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<link rel="icon" href="/images/favicon.ico"/>
+{% block title %}<title>Ingångssidan | Rikstermbanken</title>{% endblock %}
+
+<link rel="stylesheet" type="text/css" media="all" href="/static/theme.css" />
+
+<meta name="menu" content="MainMenu"/>
+
+<script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+function showProgress() {
+document.getElementById("progress").style.visibility = "visible";
+}
+function hideProgress() {
+document.getElementById("progress").style.visibility = "hidden";
+}
+</script>
+  <!-- Matomo -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://matomo.isof.se/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', '8']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+
+</head>
+<body>
+
+<div id="page">
+<div id="header" class="clearfix">
+  
+
+<div id="headerRightText">
+  <br>
+  <a href="/om.html">Om Rikstermbanken</a>
+  |
+  <a href="/kontakt.html">Kontakt</a>
+  
+  
+  
+</div>
+
+</div>
+
+<div id="content" class="clearfix">
+<div id="main">
+  <h1></h1>
+  {% block main %}
+  {% endblock %}
+</div>
+<div id="nav">
+<div class="wrapper">
+  <h2 class="accessibility">Navigation</h2>
+  <ul id="primary-nav">
+    <li>
+    <a href="/mainMenu.html" title="Ingångssidan">Ingångssidan</a>
+    </li>
+    
+    <li>
+    <a href="/startSimpleSearch.html" title="Enkel sökning" >Enkel sökning</a>
+    
+    </li>
+    
+    
+    
+    <li>
+    <a href="/ts/startAdvancedSearch.html" title="Utökad sökning" >Utökad sökning</a>
+    
+    </li>
+    
+    <li>
+    <a href="/kallor.html" title="Källor" >Källor</a>
+    
+    </li>
+    
+    
+    
+    <li>
+    <a href="/nyheter.html" title="Senaste nytt" >Senaste nytt</a>
+    
+    </li>
+    
+    
+    
+    <li>
+    <a href="/fragorochsvar.html" title="Frågor och svar" >Frågor och svar</a>
+    
+    </li>
+    
+    
+    
+    <li>
+    <a href="/hjalp.html" title="Hjälp" >Hjälp</a>
+    
+    </li>
+  </ul>
+</div>
+<hr/>
+</div><!-- end nav -->
+</div>
+
+<div id="footer" class="clearfix">
+  <table width="100%">
+    <tr>
+      <td style="width: 100px; text-align: left; padding-left: 36px; padding-top: 15px; vertical-align: bottom;">
+      </td>
+      <td style="text-align: left; padding-left: 5px; padding-top: 15px; vertical-align: bottom;">       </td>
+      <td style="text-align: right; padding-right: 40px; padding-top: 15px; vertical-align: bottom;">Version: {{version}}
+      </td>
+    </tr>
+  </table>
+</div>
+</div>
+
+</body>
+</html>
